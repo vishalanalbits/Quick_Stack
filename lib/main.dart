@@ -13,7 +13,7 @@ void main() async {
   await Parse().initialize(keyApplicationId, keyParseServerUrl,
       clientKey: keyClientKey, debug: true);
 
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: LoginPage(),
     debugShowCheckedModeBanner: false,
   ));

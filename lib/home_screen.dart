@@ -85,171 +85,343 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-          automaticallyImplyLeading: false,
-          title: const Text(
-            "Student Tracker",
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Colors.blueAccent),
       body: Column(
-        children: <Widget>[
-          Container(
-            padding: const EdgeInsets.fromLTRB(17.0, 1.0, 7.0, 1.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    autocorrect: true,
-                    textCapitalization: TextCapitalization.sentences,
-                    controller: studentNameController,
-                    decoration: const InputDecoration(
-                      labelText: "Student name",
-                      labelStyle: TextStyle(color: Colors.blueAccent),
-                    ),
+        children: [
+          const SizedBox(height: 40.0), // Adds margin above the AppBar
+          AppBar(
+            title: const Text(
+              'Task Tracker',
+              style: TextStyle(
+                fontSize: 35.0,
+                color: Color.fromARGB(255, 240, 240, 251),
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            centerTitle: true,
+            elevation: 0, // Optional: Remove AppBar shadow
+            backgroundColor: const Color.fromARGB(255, 66, 49, 113),
+            actions: [
+              Tooltip(
+                message: 'Log out', // This is the title you want to show
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.logout,
+                    color: Color.fromARGB(
+                        255, 240, 240, 251), // Set the icon color here
                   ),
+                  onPressed: () async {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Logged out!!')),
+                    );
+                    // Wait for the snackbar to be dismissed before navigating
+                    await Future.delayed(const Duration(seconds: 2));
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const LoginPage()), //Pooja
+                    );
+                  },
                 ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(17.0, 1.0, 7.0, 1.0),
-            child: Row(
-              children: <Widget>[
-                Expanded(
-                  child: TextField(
-                    autocorrect: true,
-                    textCapitalization: TextCapitalization.sentences,
-                    controller: studentTaskController,
-                    decoration: const InputDecoration(
-                      labelText: "Student task",
-                      labelStyle: TextStyle(color: Colors.blueAccent),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 10),
-          // Button to select date
-          ElevatedButton(
-            onPressed: () => _selectDate(context),
-            child: Text(
-              _selectedDate != null
-                  ? 'Selected Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate!.toLocal())}'
-                  : 'Select Date',
-            ),
-          ),
-          const SizedBox(height: 10),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: const Color.fromARGB(255, 221, 230, 164),
-              backgroundColor: Colors.blueAccent,
-            ),
-            onPressed: _selectedTask != null ? _updateTask : addToDo,
-            child: Text(_selectedTask != null ? "UPDATE" : "ADD"),
+              ),
+            ],
           ),
           Expanded(
-            child: FutureBuilder<List<ParseObject>>(
-              future: getTodo(),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                    return const Center(
-                      child: SizedBox(
-                        width: 100,
-                        height: 100,
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
-                  default:
-                    if (snapshot.hasError) {
-                      return const Center(
-                        child: Text("Error..."),
-                      );
-                    }
-                    if (!snapshot.hasData) {
-                      return const Center(
-                        child: Text("No Data..."),
-                      );
-                    } else {
-                      return ListView.builder(
-                        padding: const EdgeInsets.only(top: 10.0),
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          final varTodo = snapshot.data![index];
-                          final varStudentName = varTodo.get<String>('title')!;
-                          final varStudentTask =
-                              varTodo.get<String>('description')!;
-                          final varDone = varTodo.get<bool>('done')!;
-                          final varDate = varTodo.get<DateTime>('date') ??
-                              DateTime.now(); // Fetch date from ParseObject
-
-                          return ListTile(
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(varStudentTask),
-                                Text(
-                                  varStudentName,
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                                Text(
-                                  'Date: ${DateFormat('yyyy-MM-dd').format(varDate.toLocal())}', // Format date for display
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 12,
-                                  ),
-                                ),
-                              ],
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 24.0, vertical: 48.0),
+                child: Form(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      TextFormField(
+                        controller: studentNameController,
+                        decoration: InputDecoration(
+                          labelText: 'Task Title',
+                          labelStyle: const TextStyle(
+                              color: Color.fromARGB(255, 66, 49, 113)),
+                          filled: true, // Enables the background color
+                          fillColor: const Color.fromARGB(
+                              255, 230, 230, 250), // Background color
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(
+                                  255, 66, 49, 113), // Border color
+                              width: 2.0, // Border width
                             ),
-                            leading: CircleAvatar(
-                              backgroundColor:
-                                  varDone ? Colors.green : Colors.blue,
-                              foregroundColor:
-                                  const Color.fromARGB(255, 221, 230, 164),
-                              child: Icon(varDone ? Icons.check : Icons.error),
+                            borderRadius:
+                                BorderRadius.circular(8.0), // Rounded corners
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(255, 123, 97,
+                                  255), // Border color when focused
+                              width: 2.0, // Border width when focused
                             ),
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Checkbox(
-                                  value: varDone,
-                                  onChanged: (value) async {
-                                    await updateTodo(varTodo.objectId!, value!);
-                                    setState(() {});
-                                  },
-                                ),
-                                IconButton(
-                                  icon: const Icon(
-                                    Icons.delete,
-                                    color: Colors.blue,
-                                  ),
-                                  onPressed: () async {
-                                    await deleteTodo(varTodo.objectId!);
-                                    setState(() {
-                                      const snackBar = SnackBar(
-                                        content: Text("Task deleted!"),
-                                        duration: Duration(seconds: 2),
-                                      );
-                                      ScaffoldMessenger.of(context)
-                                        ..removeCurrentSnackBar()
-                                        ..showSnackBar(snackBar);
-                                    });
-                                  },
-                                )
-                              ],
+                            borderRadius:
+                                BorderRadius.circular(8.0), // Rounded corners
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.red, // Border color for errors
+                              width: 2.0,
                             ),
-                          );
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color:
+                                  Colors.red, // Border color for focused errors
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Title cannot be empty';
+                          } else if (value.length < 6) {
+                            return 'Title must be at least 3 characters long';
+                          } else if (!RegExp(r'^[a-zA-Z]+$').hasMatch(value)) {
+                            return 'Title must include only letters';
+                          }
+                          return null;
                         },
-                      );
-                    }
-                }
-              },
+                      ),
+                      const SizedBox(
+                          height: 20.0), // Adds margin between fields
+                      TextFormField(
+                        controller: studentTaskController,
+                        decoration: InputDecoration(
+                          labelText: 'Task Discription',
+                          labelStyle: const TextStyle(
+                            color: Color.fromARGB(255, 66, 49, 113),
+                          ),
+                          filled: true, // Enables the background color
+                          fillColor: const Color.fromARGB(
+                              255, 230, 230, 250), // Background color
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(255, 66, 49,
+                                  113), // Border color when enabled
+                              width: 2.0,
+                            ),
+                            borderRadius:
+                                BorderRadius.circular(8.0), // Rounded corners
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(255, 123, 97,
+                                  255), // Border color when focused
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors.red, // Border color for errors
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: const BorderSide(
+                              color: Colors
+                                  .redAccent, // Border color when focused and error
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ), // Toggles password visibility
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Description cannot be empty.';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 50.0),
+                      ElevatedButton(
+                        onPressed: () => _selectDate(context),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                              255, 66, 49, 113), // Button background color
+                          foregroundColor: const Color.fromARGB(
+                              255, 240, 240, 251), // Text color (foreground)
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 12.0,
+                              horizontal: 24.0), // Padding for the button
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                8.0), // Rounded corners like input fields
+                          ),
+                          elevation:
+                              5, // Optional: Add shadow for a raised button effect
+                          textStyle: const TextStyle(
+                            // Custom text style
+                            fontSize: 13.0, // Font size
+                            fontWeight: FontWeight.w600, // Make text bold
+                          ), // Optional: Add shadow for a raised button effect
+                        ),
+                        child: Text(
+                          _selectedDate != null
+                              ? 'Selected Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate!.toLocal())}'
+                              : 'Select Date',
+                        ),
+                      ),
+                      const SizedBox(height: 50.0),
+                      ElevatedButton(
+                        onPressed:
+                            _selectedTask != null ? _updateTask : addToDo,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color.fromARGB(
+                              255, 66, 49, 113), // Button background color
+                          foregroundColor: const Color.fromARGB(
+                              255, 240, 240, 251), // Text color
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 14.0,
+                              horizontal: 24.0), // Padding for the button
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(
+                                8.0), // Rounded corners like input fields
+                          ),
+                          elevation:
+                              5, // Optional: Add shadow for a raised button effect
+                        ),
+                        child: Text(_selectedTask != null ? "UPDATE" : "ADD"),
+                      ),
+                      Expanded(
+                        child: FutureBuilder<List<ParseObject>>(
+                          future: getTodo(),
+                          builder: (context, snapshot) {
+                            switch (snapshot.connectionState) {
+                              case ConnectionState.none:
+                              case ConnectionState.waiting:
+                                return const Center(
+                                  child: SizedBox(
+                                    width: 100,
+                                    height: 100,
+                                    child: CircularProgressIndicator(),
+                                  ),
+                                );
+                              default:
+                                if (snapshot.hasError) {
+                                  return const Center(
+                                    child: Text("Error..."),
+                                  );
+                                }
+                                if (!snapshot.hasData) {
+                                  return const Center(
+                                    child: Text("No Data..."),
+                                  );
+                                } else {
+                                  return ListView.builder(
+                                    padding: const EdgeInsets.only(top: 10.0),
+                                    itemCount: snapshot.data!.length,
+                                    itemBuilder: (context, index) {
+                                      final varTodo = snapshot.data![index];
+                                      final varStudentName =
+                                          varTodo.get<String>('title')!;
+                                      final varStudentTask =
+                                          varTodo.get<String>('description')!;
+                                      final varDone =
+                                          varTodo.get<bool>('done')!;
+                                      final varDate = varTodo
+                                              .get<DateTime>('date') ??
+                                          DateTime
+                                              .now(); // Fetch date from ParseObject
+
+                                      return ListTile(
+                                        title: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              varStudentTask,
+                                              style: const TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 66, 49, 113),
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                            ),
+                                            Text(
+                                              varStudentName,
+                                              style: const TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 160, 114, 195),
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                            Text(
+                                              'Date: ${DateFormat('yyyy-MM-dd').format(varDate.toLocal())}', // Format date for display
+                                              style: const TextStyle(
+                                                color: Color.fromARGB(
+                                                    255, 160, 114, 195),
+                                                fontSize: 12,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        leading: CircleAvatar(
+                                          backgroundColor: varDone
+                                              ? Colors.green
+                                              : const Color.fromARGB(
+                                                  255, 66, 49, 113),
+                                          foregroundColor: const Color.fromARGB(
+                                              255, 240, 240, 251),
+                                          child: Icon(varDone
+                                              ? Icons.check
+                                              : Icons.error),
+                                        ),
+                                        trailing: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Checkbox(
+                                              value: varDone,
+                                              onChanged: (value) async {
+                                                await updateTodo(
+                                                    varTodo.objectId!, value!);
+                                                setState(() {});
+                                              },
+                                            ),
+                                            IconButton(
+                                              icon: const Icon(
+                                                Icons.delete,
+                                                color: Color.fromARGB(
+                                                    255, 66, 49, 113),
+                                              ),
+                                              onPressed: () async {
+                                                await deleteTodo(
+                                                    varTodo.objectId!);
+                                                setState(() {
+                                                  const snackBar = SnackBar(
+                                                    content:
+                                                        Text("Task deleted!"),
+                                                    duration:
+                                                        Duration(seconds: 2),
+                                                  );
+                                                  ScaffoldMessenger.of(context)
+                                                    ..removeCurrentSnackBar()
+                                                    ..showSnackBar(snackBar);
+                                                });
+                                              },
+                                            )
+                                          ],
+                                        ),
+                                      );
+                                    },
+                                  );
+                                }
+                            }
+                          },
+                        ),
+                      )
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ],
