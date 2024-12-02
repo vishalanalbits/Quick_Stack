@@ -166,7 +166,7 @@ class _LoginPageState extends State<LoginPage> {
                               _isPasswordVisible
                                   ? Icons.visibility
                                   : Icons.visibility_off,
-                              color: Color.fromARGB(255, 66, 49, 113),
+                              color: const Color.fromARGB(255, 66, 49, 113),
                             ),
                             onPressed: () {
                               setState(() {
@@ -277,7 +277,7 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => SignUpPage()),
+                                    builder: (context) => const SignUpPage()),
                               );
                             },
                             style: ElevatedButton.styleFrom(

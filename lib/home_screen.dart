@@ -27,15 +27,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  final studentNameController = TextEditingController();
-  final studentTaskController = TextEditingController();
+  final taskTitleController = TextEditingController();
+  final taskDescriptionController = TextEditingController();
   DateTime? _selectedDate; // New DateTime variable for date selection
 
   ParseObject? _selectedTask;
 
   void addToDo() async {
-    if (studentTaskController.text.trim().isEmpty ||
-        studentNameController.text.trim().isEmpty) {
+    if (taskDescriptionController.text.trim().isEmpty ||
+        taskTitleController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("Empty fields"),
         duration: Duration(seconds: 2),
@@ -49,11 +49,11 @@ class _HomeScreenState extends State<HomeScreen> {
       ));
       return;
     }
-    await saveTodo(
-        studentTaskController.text, studentNameController.text, _selectedDate!);
+    await saveTodo(taskTitleController.text, taskDescriptionController.text,
+        _selectedDate!);
     setState(() {
-      studentTaskController.clear();
-      studentNameController.clear();
+      taskDescriptionController.clear();
+      taskTitleController.clear();
       _selectedDate = null;
     });
   }
@@ -76,8 +76,8 @@ class _HomeScreenState extends State<HomeScreen> {
   void _clearSelectedTask() {
     setState(() {
       _selectedTask = null;
-      studentTaskController.clear();
-      studentNameController.clear();
+      taskDescriptionController.clear();
+      taskTitleController.clear();
       _selectedDate = null; // Clear selected date
     });
   }
@@ -136,7 +136,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget>[
                       TextFormField(
-                        controller: studentNameController,
+                        controller: taskTitleController,
                         decoration: InputDecoration(
                           labelText: 'Task Title',
                           labelStyle: const TextStyle(
@@ -192,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(
                           height: 20.0), // Adds margin between fields
                       TextFormField(
-                        controller: studentTaskController,
+                        controller: taskDescriptionController,
                         decoration: InputDecoration(
                           labelText: 'Task Discription',
                           labelStyle: const TextStyle(
@@ -321,9 +321,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     itemCount: snapshot.data!.length,
                                     itemBuilder: (context, index) {
                                       final varTodo = snapshot.data![index];
-                                      final varStudentName =
+                                      final varTaskTitle =
                                           varTodo.get<String>('title')!;
-                                      final varStudentTask =
+                                      final varTaskDescription =
                                           varTodo.get<String>('description')!;
                                       final varDone =
                                           varTodo.get<bool>('done')!;
@@ -338,7 +338,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              varStudentTask,
+                                              varTaskTitle,
                                               style: const TextStyle(
                                                 color: Color.fromARGB(
                                                     255, 66, 49, 113),
@@ -347,7 +347,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               ),
                                             ),
                                             Text(
-                                              varStudentName,
+                                              varTaskDescription,
                                               style: const TextStyle(
                                                 color: Color.fromARGB(
                                                     255, 160, 114, 195),
@@ -463,8 +463,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _updateTask() async {
     if (_selectedTask != null) {
-      final title = studentTaskController.text.trim();
-      final description = studentNameController.text.trim();
+      final description = taskDescriptionController.text.trim();
+      final title = taskTitleController.text.trim();
       if (title.isNotEmpty && description.isNotEmpty) {
         _selectedTask!.set<String>('title', title);
         _selectedTask!.set<String>('description', description);
