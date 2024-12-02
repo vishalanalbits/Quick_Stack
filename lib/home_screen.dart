@@ -118,7 +118,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                          builder: (context) => const LoginPage()), //Pooja
+                          builder: (context) => const LoginPage()),
                     );
                   },
                 ),

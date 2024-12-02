@@ -317,8 +317,7 @@ class _SignUpPageState extends State<SignUpPage> {
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-                                        const LoginPage()), //Pooja
+                                    builder: (context) => const LoginPage()),
                               );
                             },
                             style: ElevatedButton.styleFrom(
